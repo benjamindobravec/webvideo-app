@@ -1,0 +1,139 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    color: #000;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+}
+
+.header {
+    background: #fff;
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.header-title {
+    font-size: 18px;
+    color: #000;
+    font-weight: 400;
+    color: #000;
+}
+
+.main {
+    display: flex;
+    width: calc(100% - 40px);
+    margin: 0 20px;
+    margin-top: 20px;
+    margin-left: 0;
+}
+
+.main-title {
+    margin-top: 15px;
+    font-size: 20px;
+    color: #000;
+}
+
+.main-description {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #757575;
+}
+
+.main-video {
+    flex: 1;
+    margin-right: 20px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.main-video video {
+    max-height: 90vh;
+    min-height: 380px;
+    width: auto;
+    border: 1px solid #eee;
+}
+
+.main-suggestion {
+    width: 280px;
+    margin-right: 50px;
+}
+
+.suggestion {
+    margin-bottom: 12px;
+    cursor: pointer;
+    padding: 7px;
+    border-radius: 5px;
+}
+
+.suggestion:hover .suggestion-title {
+    text-decoration: underline;
+}
+
+.suggestion-title {
+    font-size: 15px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 8px;
+}
+
+.suggestion-description {
+    color: #757575;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-top: 4px;
+}
+
+.suggestion-selected {
+    background-color: #ef5350;
+    color: #fff;
+}
+
+.suggestion-selected .suggestion-description {
+    color: #ffcdd2;
+}
+
+.menu {
+    width: auto;
+    margin-right: 40px;
+    min-width: 250px;
+    padding-left: 20px;
+}
+
+.menu-item {
+    cursor: pointer;
+    padding: 12px 7px;
+    border-radius: 5px;
+}
+
+.menu-item.menu-item-selected {
+    background-color: #e0e0e0;
+}
+
+.menu-item-text {
+    font-size: 15px;
+    color: #000;
+}
+
+.menu-item:hover .menu-item-text {
+    text-decoration: underline;
+}
+
+.main-categories {
+    display: flex;
+    margin-top: 10px;
+}
+
+.main-category {
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    color: #616161;
+    padding: 4px 6px;
+    font-size: 12px;
+    letter-spacing: 0.089em;
+    display: inline-block;
+    margin-right: 6px;
+    margin-bottom: 6px;
+}

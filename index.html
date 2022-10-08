@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Videos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <div id="main-title" class="header-title"></div>
+    </div>
+    <div class="main">
+        <div id="menu" class="menu">
+        </div>
+        <div class="main-video">
+            <video id="video" controls>
+            </video>
+            <div id="video-title" class="main-title"></div>
+            <div id="video-categories" class="main-categories"></div>
+            <div id="video-date" class="main-description"></div>
+            <div id="video-description" class="main-description"></div>
+        </div>
+        <div id="suggestions" class="main-suggestion">
+            <div class="suggestion">
+                <div class="suggestion-title"></div>
+                <div class="suggestion-description"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var _data = null;
+        var _selected = null;
+        var _selectedIndex = null;
+        var _selectedMenuId = null;
+
+        function get(url, callback) {
+            let req = new XMLHttpRequest();
+            req.open("GET", url, false);
+            req.onreadystatechange = function () {
+                if (req.readyState === 4) {
+                    if (req.status === 200 || req.status == 0)
+                        callback(JSON.parse(req.responseText));
+                }
+            }
+            req.send();
+        }
+
+        function createEl(text, className) {
+            let el = document.createElement("div");
+            el.className = className;
+            if (text)
+                el.innerHTML = text;
+            return el;
+        }
+
+        function setInnerHtml(id, value) {
+            document.getElementById(id).innerHTML = value;
+        }
+
+        function getMonthName(month) {
+            var ar = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            return ar[month];
+        }
+
+        function getDisplayDate(value) {
+            const date = new Date(value);
+            return date.getDate() + " " + getMonthName(date.getMonth()) + " " + date.getFullYear();
+        }
+
+        function getVideoCategories(video) {
+            let result = [];
+            if (_data && _data.categories && video && video.categories) {
+                for (let videoCategory of video.categories) {
+                    for (let category of _data.categories) {
+                        if (category.id == videoCategory)
+                            result.push(category);
+                    }
+                }
+            }
+            return result;
+        }
+
+        function loadVideo(video, index) {
+            _selected = video;
+            _selectedIndex = index;
+            setTimeout(() => {
+                setInnerHtml("video-title", video.title);
+                setInnerHtml("video-description", video.description);
+                setInnerHtml("video-date", getDisplayDate(video.date));
+                const videoEl = document.getElementById("video");
+                videoEl.pause();
+                videoEl.innerHTML = "";
+                const source = document.createElement('source');
+                source.setAttribute('src', video.url);
+                source.setAttribute('type', 'video/mp4');
+                videoEl.appendChild(source);
+                videoEl.load();
+                videoEl.play();
+                const categoriesEl = document.getElementById("video-categories");
+                categoriesEl.innerHTML = "";
+                for (let category of getVideoCategories(video)) {
+                    const categoryEl = document.createElement("div");
+                    categoryEl.className = "main-category";
+                    categoryEl.innerHTML = category.title;
+                    categoriesEl.appendChild(categoryEl);
+                }
+                loadSuggestions(_data);
+                loadMenu(_data);
+            }, 1);
+        }
+
+        function loadSuggestions(data) {
+            const suggestionsEl = document.getElementById("suggestions");
+            const videos = getCategoryVideos();
+            if (videos.length) {
+                suggestionsEl.innerHTML = "";
+                for (let i = 0, size = videos.length; i < size; i++) {
+                    const video = videos[i];
+                    let s = createEl(null, "suggestion");
+                    if (_selectedIndex === i)
+                        s.classList.add("suggestion-selected");
+                    s.append(createEl(video.title, "suggestion-title"))
+                    s.append(createEl(video.description, "suggestion-description"));
+                    s.append(createEl(getDisplayDate(video.date), "suggestion-description"));
+                    s.addEventListener("click", () => loadVideo(video, i));
+                    suggestionsEl.append(s);
+                }
+            }
+            else
+                suggestionsEl.innerHTML = "No suggestions";
+        }
+
+        function getCategoryVideos() {
+            let result = [];
+            if (_data && _data.videos) {
+                for (let i = 0, size = _data.videos.length; i < size; i++) {
+                    const video = _data.videos[i];
+                    if (video.categories && -1 < video.categories.indexOf(_selectedMenuId))
+                        result.push(video);
+                }
+            }
+            return result;
+        }
+
+        function loadCategory(category) {
+            _selectedMenuId = category.id;
+            const videos = getCategoryVideos();
+            if (videos.length) {
+                let selected = videos[0];
+                loadVideo(selected, 0);
+            }
+            loadMenu(_data);
+            loadSuggestions(_data);
+        }
+
+        function loadMenu(data) {
+            const menuEl = document.getElementById("menu");
+            if (data && data.categories && data.categories.length) {
+                menuEl.innerHTML = "";
+                for (let i = 0, size = data.categories.length; i < size; i++) {
+                    const category = data.categories[i];
+                    let item = createEl(null, "menu-item");
+                    if (_selectedMenuId === category.id)
+                        item.classList.add("menu-item-selected");
+                    item.append(createEl(category.title, "menu-item-text"))
+                    item.addEventListener("click", () => loadCategory(category));
+                    menuEl.append(item);
+                }
+            }
+            else
+                menuEl.innerHTML = "No suggestions";
+        }
+
+        window.addEventListener('load', () => {
+            get("media/videos.json", json => {
+                _data = json;
+                document.getElementById("main-title").innerHTML = json.title;
+                if (json.categories.length) {
+                    _selectedMenuId = json.categories[0].id;
+                    loadCategory(json.categories[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
